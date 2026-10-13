@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Platte SD Grain, Weather & Markets</title>
+  <style>
+    :root {
+      --bg: #f4f7f0;
+      --card: #ffffff;
+      --primary: #2d6a4f;
+      --corn: #e9c46a;
+      --soy: #52b788;
+      --wheat: #d4a373;
+      --text: #1b4332;
+      --muted: #52796f;
+      --border: #d8e2dc;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 1.5rem 1rem 3rem;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 1.75rem;
+    }
+
+    header h1 {
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    header p {
+      color: var(--muted);
+      margin-top: 0.3rem;
+      font-size: 0.95rem;
+    }
+
+    .grid {
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    @media (min-width: 700px) {
+      .grid-2 { grid-template-columns: 1fr 1fr; }
+    }
+
+    .widget {
+      background: var(--card);
+      border-radius: 14px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .widget-header {
+      background: var(--primary);
+      color: white;
+      padding: 0.85rem 1.15rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .widget-header h2 {
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .updated {
+      font-size: 0.78rem;
+      opacity: 0.9;
+    }
+
+    /* Grain prices */
+    .prices {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 640px) {
+      .prices { grid-template-columns: 1fr 1fr 1fr; }
+    }
+
+    .price-card {
+      padding: 1.25rem 1.1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    @media (min-width: 640px) {
+      .price-card {
+        border-bottom: none;
+        border-right: 1px solid var(--border);
+      }
+      .price-card:last-child { border-right: none; }
+    }
+
+    .commodity {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.55rem;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+
+    .dot.corn { background: var(--corn); }
+    .dot.soy  { background: var(--soy); }
+    .dot.wheat { background: var(--wheat); }
+
+    .commodity h3 {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .cash-price {
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .unit {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .basis {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 0.25rem;
+    }
+
+    .futures {
+      margin-top: 0.7rem;
+      padding-top: 0.6rem;
+      border-top: 1px dashed var(--border);
+      font-size: 0.82rem;
+    }
+
+    .futures span { font-weight: 600; color: var(--text); }
+
+    /* Weather */
+    .weather-body {
+      padding: 1.3rem 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .temp-big {
+      font-size: 2.6rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .weather-details {
+      font-size: 0.95rem;
+    }
+
+    .weather-details strong { display: block; margin-bottom: 0.15rem; }
+
+    .hi-lo {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-top: 0.35rem;
+    }
+
+    /* Joke */
+    .joke-body {
+      padding: 1.4rem 1.25rem;
+      font-size: 1.05rem;
+      font-style: italic;
+      line-height: 1.55;
+    }
+
+    .joke-body .source {
+      margin-top: 0.9rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-style: normal;
+    }
+
+    /* Dow */
+    .dow-body {
+      padding: 1.3rem 1.2rem;
+      text-align: center;
+    }
+
+    .dow-value {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .dow-change {
+      font-size: 1.05rem;
+      margin-top: 0.25rem;
+    }
+
+    .up { color: #2d6a4f; }
+    .down { color: #bc4749; }
+
+    .dow-note {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.6rem;
+    }
+
+    .footer-note {
+      padding: 0.9rem 1.15rem;
+      background: #f8faf6;
+      font-size: 0.78rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    .disclaimer {
+      margin-top: 1.75rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-align: center;
+      max-width: 620px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Platte, SD Local Info</h1>
+      <p>Grain prices · Weather · Farming joke · Markets</p>
+    </header>
+
+    <!-- Grain Prices -->
+    <div class="widget" style="margin-bottom: 1.25rem;">
+      <div class="widget-header">
+        <h2>Local Cash Bids (approx.)</h2>
+        <div class="updated" id="last-updated">Updated: Oct 12, 2026</div>
+      </div>
+
+      <div class="prices">
+        <!-- Corn -->
+        <div class="price-card">
+          <div class="commodity">
+            <div class="dot corn"></div>
+            <h3>Corn (#2 Yellow)</h3>
+          </div>
+          <div class="cash-price">$4.15 – $4.40</div>
+          <div class="unit">per bushel</div>
+          <div class="basis">Basis ≈ −65¢ to −40¢ vs Dec</div>
+          <div class="futures">Futures (Dec ’26): <span>~$4.83</span></div>
+        </div>
+
+        <!-- Soybeans -->
+        <div class="price-card">
+          <div class="commodity">
+            <div class="dot soy"></div>
+            <h3>Soybeans (#1)</h3>
+          </div>
+          <div class="cash-price">$12.30 – $12.55</div>
+          <div class="unit">per bushel</div>
+          <div class="basis">Basis ≈ −60¢ to −40¢ vs Nov</div>
+          <div class="futures">Futures (Nov ’26): <span>~$12.88</span></div>
+        </div>
+
+        <!-- Wheat -->
+        <div class="price-card">
+          <div class="commodity">
+            <div class="dot wheat"></div>
+            <h3>Wheat (HRS / HRW)</h3>
+          </div>
+          <div class="cash-price">$5.95 – $6.35</div>
+          <div class="unit">per bushel</div>
+          <div class="basis">Basis ≈ −70¢ to −40¢ (varies by protein)</div>
+          <div class="futures">CBOT Dec ’26: <span>~$6.73</span></div>
+        </div>
+      </div>
+
+      <div class="footer-note">
+        Approximate Southeast South Dakota country elevator bids. Actual prices vary by location, delivery period, and quality. Confirm with local elevators or check AGSIST (ZIP 57369).
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom: 1.25rem;">
+      <!-- Weather -->
+      <div class="widget">
+        <div class="widget-header">
+          <h2>Platte, SD Weather</h2>
+          <div class="updated">Tonight</div>
+        </div>
+        <div class="weather-body">
+          <div>
+            <div class="temp-big">54°</div>
+            <div class="unit">F</div>
+          </div>
+          <div class="weather-details">
+            <strong>Partly Cloudy</strong>
+            Feels like 47° · Wind NW 16 mph<br>
+            <div class="hi-lo">Today: High 58° · Low 50°</div>
+          </div>
+        </div>
+        <div class="footer-note">
+          Data approximate for Platte area. Check NWS or local radar for the latest.
+        </div>
+      </div>
+
+      <!-- Dow -->
+      <div class="widget">
+        <div class="widget-header">
+          <h2>Dow Jones</h2>
+          <div class="updated">Oct 12 close</div>
+        </div>
+        <div class="dow-body">
+          <div class="dow-value">51,850.55</div>
+          <div class="dow-change up">+195.60 (+0.38%)</div>
+          <div class="dow-note">
+            Previous close: 51,654.95<br>
+            Day range: 51,719 – 51,928
+          </div>
+        </div>
+        <div class="footer-note">
+          Delayed market data. For live charts visit Yahoo Finance or MarketWatch.
+        </div>
+      </div>
+    </div>
+
+    <!-- Joke of the Day -->
+    <div class="widget">
+      <div class="widget-header">
+        <h2>Farming Joke of the Day</h2>
+        <div class="updated" id="joke-date"></div>
+      </div>
+      <div class="joke-body" id="joke-text">
+        Loading joke…
+      </div>
+    </div>
+
+    <p class="disclaimer">
+      All prices and data are approximate / delayed and for informational purposes only.
+      Not for trading decisions. Always verify with local elevators, the National Weather Service, and official market sources.
+    </p>
+  </div>
+
+  <script>
+    // Update date stamps
+    const now = new Date();
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    document.getElementById('last-updated').textContent =
+      'Updated: ' + now.toLocaleDateString('en-US', options);
+    document.getElementById('joke-date').textContent =
+      now.toLocaleDateString('en-US', options);
+
+    // Farming jokes – rotates daily based on day of year
+    const jokes = [
+      "Why did the farmer win an award? Because he was outstanding in his field!",
+      "What do you call a cow that plays the guitar? A moo-sician!",
+      "Why don’t farmers ever tell secrets in the cornfield? Because the corn has ears!",
+      "How do farmers party? They turnip the beet!",
+      "What’s a farmer’s favorite type of music? Country… of course!",
+      "Why did the scarecrow get promoted? He was outstanding in his field!",
+      "What do you get when you cross a tractor with a dog? A collie-flower!",
+      "Why was the farmer always calm? He had a lot of patience… and hay!",
+      "What did the grape say when the farmer stepped on it? Nothing — it just let out a little wine!",
+      "Why do chickens make terrible comedians? Their jokes are always fowl!",
+      "What’s a pig’s favorite karate move? A pork chop!",
+      "Why did the farmer feed his cows money? He wanted rich milk!",
+      "How does a farmer fix a broken tractor? With a combine!",
+      "What do you call a sheep covered in chocolate? A candy baa!",
+      "Why are farmers so good at telling jokes? They have a lot of corny material!"
+    ];
+
+    // Day of year (0-365)
+    const start = new Date(now.getFullYear(), 0, 0);
+    const diff = now - start;
+    const oneDay = 1000 * 60 * 60 * 24;
+    const dayOfYear = Math.floor(diff / oneDay);
+
+    const jokeIndex = dayOfYear % jokes.length;
+    document.getElementById('joke-text').innerHTML =
+      jokes[jokeIndex] +
+      '<div class="source">Changes automatically every day</div>';
+  </script>
+</body>
+</html>
